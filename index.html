@@ -1,0 +1,91 @@
+<!doctype html>
+<html>
+  <head>
+
+    <title>Socket.IO chat</title>
+	
+  <body>
+
+<div style="color:#0000FF">
+  <h3>Received data from server</h3>
+  <p id="counter1"></p>
+  <p id="counter2"></p>
+</div>
+    <form action="">
+    <input id="m" autocomplete="off" /><button>Send</button>
+    </form>
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+	
+	<script src="http://code.highcharts.com/highcharts.js"></script>
+	<script src="http://code.highcharts.com/modules/exporting.js"></script>
+	<div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+	<script>
+	
+	  var socket = io();
+	  $('form').submit(function(){
+		socket.emit('chat message', $('#m').val());
+		$('#m').val('');
+		return false;
+	  });
+	
+		socket.on('counter1', function(msg){
+		document.getElementById("counter1").innerHTML = msg;
+		$('#container').highcharts().series[0].data[0].update(msg);
+		
+	});
+		socket.on('counter2', function(msg){
+		document.getElementById("counter2").innerHTML = msg;
+		$('#container').highcharts().series[0].data[1].update(msg);
+	});
+	
+
+	
+    $('#container').highcharts({
+        chart: {
+            type: 'column'
+			
+        },
+
+        title: {
+            text: 'Counters'
+        },
+        subtitle: {
+            text: ''
+        },
+        xAxis: {
+            categories: [
+                'First Counter',
+                'Second Counter',
+            ]
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Count'
+            }
+        },
+        tooltip: {
+            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                '<td style="padding:0"><b>{point.y:.1f}</b></td></tr>',
+            footerFormat: '</table>',
+            shared: true,
+            useHTML: true
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0
+            }
+        },
+        series: [{
+            name: 'Value',
+            data: [0,0]
+
+        }]
+    });
+
+	</script>
+  </body>
+</html>
